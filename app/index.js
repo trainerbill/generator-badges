@@ -59,27 +59,33 @@ module.exports = yeoman.Base.extend({
         this.option("badges", { type: Array, required: false, alias: "b",
             desc: "Badges list: yo badges -b npm travis coveralls dependencies devDependencies",
         });
+        this.option("nosay", { type: Boolean, required: false, alias: "n",
+            desc: "No say:  Prevent yo say for composability",
+        });
     },
-    
+
     initializing: function initializing() {
-        this.log(yosay("Welcome to the generator badges!"));
+        if(!this.options.nosay) {
+          this.log(yosay("Welcome to the generator badges!"));
+        }
         this.props = {};
-    },  
-    
+    },
+
     prompting: function prompting() {
         if (this.noPrompts) {
             return;
         }
-        var done = this.async();
 
         var prompts = [{
             name: "project",
             message: "Project name:",
-            validate: ifEmpty('You need to provide a project name')
+            validate: ifEmpty('You need to provide a project name'),
+            default: this.options.project || ''
         }, {
             name: "user",
             message: "Github profile:",
-            validate: ifEmpty('You need to provide a github username')
+            validate: ifEmpty('You need to provide a github username'),
+            default: this.options.user || ''
         }, {
             type: "checkbox",
             name: "badges",
@@ -112,19 +118,21 @@ module.exports = yeoman.Base.extend({
                 name: 'travis',
                 value: 'travis',
                 checked: false
-            }]
+            }],
+            store: true
         }];
 
-        this.prompt(prompts, function (inputAnswers) {
+        return this.prompt(prompts, function (inputAnswers) {
+            console.log('Badging prompts done');
             this.props = assign({}, inputAnswers);
-            done();
         }.bind(this));
     },
-    
+
     writing: function writing() {
+      console.log('Badging writing');
         var cli = {};
         var optional =  this.options.config || {};
-        
+
         var badges = this.options.badges;
         if (typeof badges === "boolean") {
             this.log("Perhaps you forgot double dash: `-badges` instead of `--badges`");
@@ -135,11 +143,11 @@ module.exports = yeoman.Base.extend({
             // TODO: need to replace on row above;
             cli.badges = badges;
         }
-        
+
         cli.user = this.options.user;
         cli.project = this.options.project;
         var common = mergeAndConcat(cli, optional, this.props);
-        
+
         var result = "";
         common.badges.forEach(function(b) {
             result += badgesArr[b].init + "\n"
