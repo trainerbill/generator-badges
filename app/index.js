@@ -64,14 +64,14 @@ module.exports = yeoman.Base.extend({
         });
     },
 
-    initializing: function initializing() {
+    initializing: function () {
         if(!this.options.nosay) {
           this.log(yosay("Welcome to the generator badges!"));
         }
         this.props = {};
     },
 
-    prompting: function prompting() {
+    prompting: function () {
         if (this.noPrompts) {
             return;
         }
@@ -128,7 +128,7 @@ module.exports = yeoman.Base.extend({
         }.bind(this));
     },
 
-    writing: function writing() {
+    writing: function () {
       console.log('Badging writing');
         var cli = {};
         var optional =  this.options.config || {};
@@ -159,14 +159,9 @@ module.exports = yeoman.Base.extend({
                 .replace("\{user\}", common.user) + "\n";
         });
 
-        this.fs.write(
+        return this.fs.write(
             this.destinationPath("README.md"),
             result
         )
-    },
-    install: function install() {
-        if (!this.options["skip-install"]) {
-            this.npmInstall();
-        }
-    },
+    }
 });
